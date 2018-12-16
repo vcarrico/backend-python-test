@@ -1,4 +1,3 @@
-from alayatodo import app, db
 from flask import (
     g,
     redirect,
@@ -7,8 +6,12 @@ from flask import (
     session
 )
 
-from alayatodo.forms import TodoForm
+from alayatodo import app, db
+
+from alayatodo.forms import TodoForm, LoginForm
 from alayatodo.models import Todo
+from alayatodo.helpers import (
+    login_user, login_redirect, login_required)
 
 
 @app.route('/')
@@ -18,25 +21,20 @@ def home():
         return render_template('index.html', readme=readme)
 
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET', 'POST'])
+@login_redirect('/todo')
 def login():
-    return render_template('login.html')
-
-
-@app.route('/login', methods=['POST'])
-def login_POST():
+    error = ''
     username = request.form.get('username')
     password = request.form.get('password')
+    form = LoginForm(request.form)
 
-    sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'";
-    cur = g.db.execute(sql % (username, password))
-    user = cur.fetchone()
-    if user:
-        session['user'] = dict(user)
-        session['logged_in'] = True
-        return redirect('/todo')
-
-    return redirect('/login')
+    if request.method == 'POST' and form.validate():
+        logged_in = login_user(username=username, password=password)
+        if logged_in:
+            return redirect('/todo')
+        error = "Invalid username or password!"
+    return render_template('login.html', error=error)
 
 
 @app.route('/logout')
@@ -47,20 +45,25 @@ def logout():
 
 
 @app.route('/todo/<id>', methods=['GET'])
+@login_required
 def todo(id):
     cur = g.db.execute("SELECT * FROM todos WHERE id ='%s'" % id)
     todo = cur.fetchone()
     return render_template('todo.html', todo=todo)
 
 
-@app.route('/todo', methods=['POST', 'GET'])
-@app.route('/todo/', methods=['POST', 'GET'])
-def todos():
-    if not session.get('logged_in'):
-        return redirect('/login')
+@app.route('/todo', methods=['GET'], strict_slashes=False)
+@login_required
+def todos_list():
+    todos = Todo.query.filter_by(user_id=session['user']['id']).all()
+    return render_template('todos.html', todos=todos, add_todo_form=TodoForm())
 
+
+@app.route('/todo', methods=['POST'], strict_slashes=False)
+@login_required
+def todo_insert():
     form = TodoForm(request.form)
-    if request.method == 'POST' and form.validate():
+    if form.validate():
         todo = Todo(
             description=form.data['description'],
             user_id=session['user']['id'])
@@ -73,9 +76,8 @@ def todos():
 
 
 @app.route('/todo/<id>', methods=['POST'])
+@login_required
 def todo_delete(id):
-    if not session.get('logged_in'):
-        return redirect('/login')
     g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
     g.db.commit()
     return redirect('/todo')

@@ -15,6 +15,12 @@ class User(db.Model):
     def __repr__(self):
         return "User: {}".format(self.username)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username
+        }
+
 
 class Todo(db.Model):
     __tablename__ = 'todos'
