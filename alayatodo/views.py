@@ -1,5 +1,4 @@
 from flask import (
-    g,
     redirect,
     render_template,
     request,
@@ -47,8 +46,7 @@ def logout():
 @app.route('/todo/<id>', methods=['GET'])
 @login_required
 def todo(id):
-    cur = g.db.execute("SELECT * FROM todos WHERE id ='%s'" % id)
-    todo = cur.fetchone()
+    todo = Todo.query.filter_by(id=id, user_id=session['user']['id']).first()
     return render_template('todo.html', todo=todo)
 
 
@@ -78,6 +76,8 @@ def todo_insert():
 @app.route('/todo/<id>', methods=['POST'])
 @login_required
 def todo_delete(id):
-    g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
-    g.db.commit()
+    todo = Todo.query.filter_by(id=id, user_id=session['user']['id']).first()
+    if todo:
+        db.session.delete(todo)
+        db.session.commit()
     return redirect('/todo')
