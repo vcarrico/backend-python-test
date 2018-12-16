@@ -1,4 +1,4 @@
-from alayatodo import app
+from alayatodo import app, db
 from flask import (
     g,
     redirect,
@@ -6,6 +6,9 @@ from flask import (
     request,
     session
 )
+
+from alayatodo.forms import TodoForm
+from alayatodo.models import Todo
 
 
 @app.route('/')
@@ -50,27 +53,23 @@ def todo(id):
     return render_template('todo.html', todo=todo)
 
 
-@app.route('/todo', methods=['GET'])
-@app.route('/todo/', methods=['GET'])
+@app.route('/todo', methods=['POST', 'GET'])
+@app.route('/todo/', methods=['POST', 'GET'])
 def todos():
     if not session.get('logged_in'):
         return redirect('/login')
-    cur = g.db.execute("SELECT * FROM todos")
-    todos = cur.fetchall()
-    return render_template('todos.html', todos=todos)
 
+    form = TodoForm(request.form)
+    if request.method == 'POST' and form.validate():
+        todo = Todo(
+            description=form.data['description'],
+            user_id=session['user']['id'])
+        db.session.add(todo)
+        db.session.commit()
+        return redirect('/todo')
 
-@app.route('/todo', methods=['POST'])
-@app.route('/todo/', methods=['POST'])
-def todos_POST():
-    if not session.get('logged_in'):
-        return redirect('/login')
-    g.db.execute(
-        "INSERT INTO todos (user_id, description) VALUES ('%s', '%s')"
-        % (session['user']['id'], request.form.get('description', ''))
-    )
-    g.db.commit()
-    return redirect('/todo')
+    todos = Todo.query.filter_by(user_id=session['user']['id']).all()
+    return render_template('todos.html', todos=todos, add_todo_form=form)
 
 
 @app.route('/todo/<id>', methods=['POST'])

@@ -1,5 +1,5 @@
-from wtforms import Form, BooleanField, StringField, IntegerField, validators
+from wtforms import validators, Form, StringField
 
 
 class TodoForm(Form):
-    user_id = 
+    description = StringField(u'description', [validators.required(), ])
