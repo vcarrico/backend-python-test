@@ -3,7 +3,7 @@ from decouple import config
 
 DATABASE = '/tmp/alayatodo.db'
 DEBUG = True
-SECRET_KEY = 'development key'
+SECRET_KEY = config('SECRET_KEY', default='dev_secret_key')
 USERNAME = 'admin'
 PASSWORD = 'default'
 

@@ -5,6 +5,7 @@
     <h1>Login</h1>
     {{ error }}
     <form class="form-horizontal login-form" method="POST" action="{{ url_for('login') }}">
+      {{ form.csrf_token }}
       <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
         <input type="text" class="form-control" name="username" placeholder="Username">

@@ -2,7 +2,7 @@ import sqlite3
 
 from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_wtf.csrf import CSRFProtect
 
 from alayatodo import settings
 
@@ -10,6 +10,8 @@ from alayatodo import settings
 app = Flask(__name__)
 app.config.from_object(settings)
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 
 def connect_db():
