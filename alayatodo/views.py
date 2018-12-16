@@ -73,11 +73,21 @@ def todo_insert():
     return render_template('todos.html', todos=todos, add_todo_form=form)
 
 
-@app.route('/todo/<id>', methods=['POST'])
+@app.route('/todo/<id>/delete', methods=['POST', ])
 @login_required
 def todo_delete(id):
     todo = Todo.query.filter_by(id=id, user_id=session['user']['id']).first()
     if todo:
         db.session.delete(todo)
+        db.session.commit()
+    return redirect('/todo')
+
+
+@app.route('/todo/<id>/complete', methods=['POST'])
+@login_required
+def todo_complete(id):
+    todo = Todo.query.filter_by(id=id, user_id=session['user']['id']).first()
+    if todo:
+        todo.completed = not todo.completed
         db.session.commit()
     return redirect('/todo')
