@@ -1,4 +1,5 @@
 from flask import (
+    flash,
     redirect,
     render_template,
     request,
@@ -70,6 +71,7 @@ def todo_insert():
             user_id=session['user']['id'])
         db.session.add(todo)
         db.session.commit()
+        flash('ToDo added successfuly!')
         return redirect('/todo')
 
     todos = Todo.query.filter_by(user_id=session['user']['id']).all()
@@ -83,6 +85,7 @@ def todo_delete(id):
     if todo:
         db.session.delete(todo)
         db.session.commit()
+        flash("ToDo deleted successfuly!")
     return redirect('/todo')
 
 
