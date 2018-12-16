@@ -32,15 +32,10 @@
 
     <tr>
       <form method="post" action="{{ url_for('todo_insert') }}">
-        {{ add_todo_form.csrf_token }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <td colspan="3">
-          <input required type="textbox" name="{{ add_todo_form.description.name }}" class="small-6 small-center" placeholder="Description...">
+          <input type="textbox" name="description" class="small-6 small-center" placeholder="Description...">
         </td>
-          <td>
-            {% for error in add_todo_form.description.errors %}
-              <p>{{ error }}</p>
-            {% endfor %}
-          </td>
         <td>
             <button type="submit" class="btn btn-sm btn-primary">Add</button>
         </td>

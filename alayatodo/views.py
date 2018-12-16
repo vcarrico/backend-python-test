@@ -71,11 +71,10 @@ def todo_insert():
             user_id=session['user']['id'])
         db.session.add(todo)
         db.session.commit()
-        flash('ToDo added successfuly!')
-        return redirect('/todo')
-
-    todos = Todo.query.filter_by(user_id=session['user']['id']).all()
-    return render_template('todos.html', todos=todos, add_todo_form=form)
+        flash("ToDo added successfuly!")
+    else:
+        flash("ToDo description is required!")
+    return redirect('/todo')
 
 
 @app.route('/todo/<id>/delete', methods=['POST', ])
