@@ -1,6 +1,7 @@
 import sqlite3
 
 from flask import Flask, g
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 
@@ -9,7 +10,12 @@ from alayatodo import settings
 
 app = Flask(__name__)
 app.config.from_object(settings)
+
+# Database
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# CSRF Protection
 csrf = CSRFProtect(app)
 csrf.init_app(app)
 

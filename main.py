@@ -1,33 +1,18 @@
-"""AlayaNotes
+"""AlayaNotes.
 
 Usage:
-  main.py [run]
+  main.py [runserver]
   main.py initdb
 """
-from docopt import docopt
-import subprocess
-import os
+import sys
 
 from alayatodo import app
-
-
-def _run_sql(filename):
-    try:
-        subprocess.check_output(
-            "sqlite3 %s < %s" % (app.config['DATABASE'], filename),
-            stderr=subprocess.STDOUT,
-            shell=True
-        )
-    except subprocess.CalledProcessError, ex:
-        print ex.output
-        os._exit(1)
+from manage import manager
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__)
-    if args['initdb']:
-        _run_sql('resources/database.sql')
-        _run_sql('resources/fixtures.sql')
-        print "AlayaTodo: Database initialized."
-    else:
+    arg = sys.argv[1:]
+    if not arg:
         app.run(use_reloader=True)
+    else:
+        manager.run()
