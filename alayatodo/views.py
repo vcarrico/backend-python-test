@@ -3,7 +3,8 @@ from flask import (
     redirect,
     render_template,
     request,
-    session
+    session,
+    url_for
 )
 
 from alayatodo import app, db
@@ -11,7 +12,9 @@ from alayatodo import app, db
 from alayatodo.forms import TodoForm, LoginForm
 from alayatodo.models import Todo
 from alayatodo.helpers import (
-    login_user, login_redirect, login_required)
+    login_user, login_redirect, login_required,
+    get_previous_page, get_next_page, get_page_max, get_last_user_page,
+    ITEMS_PER_PAGE)
 
 
 @app.route('/')
@@ -54,11 +57,21 @@ def todo(id, response_format):
     return render_template('todo.html', todo=todo)
 
 
-@app.route('/todo', methods=['GET'], strict_slashes=False)
+@app.route('/todos/', defaults={'page': 1})
+@app.route('/todos/<int:page>', methods=['GET'], strict_slashes=False)
 @login_required
-def todos_list():
-    todos = Todo.query.filter_by(user_id=session['user']['id']).all()
-    return render_template('todos.html', todos=todos, add_todo_form=TodoForm())
+def todos_list(page):
+    user_todos = Todo.query.filter_by(user_id=session['user']['id'])
+    all_todos = user_todos.all()
+    todos_current_page = user_todos.paginate(page, ITEMS_PER_PAGE, True).items
+    context = {
+        'todos': todos_current_page,
+        'current_page': page,
+        'previous_page': get_previous_page(page),
+        'next_page': get_next_page(page, len(all_todos)),
+        'max_page': get_page_max(len(all_todos))
+    }
+    return render_template('todos.html', **context)
 
 
 @app.route('/todo', methods=['POST'], strict_slashes=False)
@@ -74,7 +87,8 @@ def todo_insert():
         flash("ToDo added successfuly!")
     else:
         flash("ToDo description is required!")
-    return redirect('/todo')
+    return redirect(
+        url_for('todos_list', page=get_last_user_page(session['user']['id'])))
 
 
 @app.route('/todo/<id>/delete', methods=['POST', ])
@@ -85,7 +99,7 @@ def todo_delete(id):
         db.session.delete(todo)
         db.session.commit()
         flash("ToDo deleted successfuly!")
-    return redirect('/todo')
+    return redirect('/todos')
 
 
 @app.route('/todo/<id>/complete', methods=['POST'])
@@ -95,4 +109,4 @@ def todo_complete(id):
     if todo:
         todo.completed = not todo.completed
         db.session.commit()
-    return redirect('/todo')
+    return redirect('/todos')

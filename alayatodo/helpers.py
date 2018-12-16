@@ -1,7 +1,11 @@
+from math import ceil
+
 from flask import session, redirect
 from functools import wraps
 
-from alayatodo.models import User
+from alayatodo.models import User, Todo
+
+ITEMS_PER_PAGE = 5
 
 
 # Login Helpers
@@ -31,3 +35,21 @@ def login_required(func):
             return redirect('/login')
         return func(*args, **kwargs)
     return func_wrapper
+
+
+# Pagination Helpers
+def get_page_max(items_count):
+    return int(ceil(items_count / float(ITEMS_PER_PAGE)))
+
+
+def get_next_page(page, items_count):
+    return min(page + 1, get_page_max(items_count))
+
+
+def get_previous_page(page):
+    min(page - 1, 1)
+
+
+def get_last_user_page(user_id):
+    user_todos = Todo.query.filter_by(user_id=user_id).all()
+    return get_page_max(len(user_todos))

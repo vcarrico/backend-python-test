@@ -9,3 +9,7 @@ body {
 .todo-completed {
     text-decoration: line-through;
 }
+
+.current-page-indicator {
+    font-weight: bold;
+}
