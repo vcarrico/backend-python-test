@@ -4,6 +4,7 @@ from functools import wraps
 from alayatodo.models import User
 
 
+# Login Helpers
 def login_user(username, password):
     user = User.query.filter_by(username=username).first()
     if user and user.password == password:
@@ -30,3 +31,8 @@ def login_required(func):
             return redirect('/login')
         return func(*args, **kwargs)
     return func_wrapper
+
+
+# Core Helpers
+def is_json_request(request):
+    return request.url.split('/')[-1] == 'json'

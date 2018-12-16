@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy_utils.types.password import PasswordType
 
 from alayatodo import db
@@ -32,3 +34,10 @@ class Todo(db.Model):
 
     def __repr__(self):
         return "To-Do <User.id {}>: {}".format(self.user_id, self.description)
+
+    def to_json(self):
+        return json.dumps({
+            'id': self.id,
+            'user_id': self.user_id,
+            'description': self.description
+        })
