@@ -11,7 +11,7 @@ from alayatodo import app, db
 from alayatodo.forms import TodoForm, LoginForm
 from alayatodo.models import Todo
 from alayatodo.helpers import (
-    login_user, login_redirect, login_required, is_json_request)
+    login_user, login_redirect, login_required)
 
 
 @app.route('/')
@@ -44,12 +44,12 @@ def logout():
     return redirect('/')
 
 
-@app.route('/todo/<id>/json', methods=['GET'])
-@app.route('/todo/<id>', methods=['GET'])
+@app.route('/todo/<int:id>', methods=['GET'], defaults={'response_format': None})
+@app.route('/todo/<int:id>/<response_format>', methods=['GET'])
 @login_required
-def todo(id):
+def todo(id, response_format):
     todo = Todo.query.filter_by(id=id, user_id=session['user']['id']).first()
-    if is_json_request(request):
+    if response_format == 'json':
         return todo.to_json()
     return render_template('todo.html', todo=todo)
 

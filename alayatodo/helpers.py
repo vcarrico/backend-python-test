@@ -31,8 +31,3 @@ def login_required(func):
             return redirect('/login')
         return func(*args, **kwargs)
     return func_wrapper
-
-
-# Core Helpers
-def is_json_request(request):
-    return request.url.split('/')[-1] == 'json'
