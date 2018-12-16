@@ -20,7 +20,7 @@ def _run_sql(filename):
         )
     except subprocess.CalledProcessError, ex:
         print ex.output
-        os.exit(1)
+        os._exit(1)
 
 
 if __name__ == '__main__':
