@@ -13,7 +13,7 @@ app.config.from_object(settings)
 
 # Database
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, directory=settings.MIGRATIONS_DIRECTORY)
 
 # CSRF Protection
 csrf = CSRFProtect(app)

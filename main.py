@@ -3,6 +3,8 @@
 Usage:
   main.py [runserver]
   main.py initdb
+  main.py db migrate
+  main.py db upgrade
 """
 import sys
 
