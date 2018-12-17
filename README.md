@@ -22,7 +22,7 @@ Credentials:
 ![Todos](/web/img/todos.png?raw=true "Todos")
 
 ### Requirements
-* python 5.7
+* python 2.7
 * virtualenv
 * sqlite3
 * A github account
@@ -33,7 +33,8 @@ Credentials:
 virtualenv .
 bin/pip install -r requirements.txt
 bin/python main.py initdb
-bin/python main.py
+bin/python main.py db upgrade
+bin/python main.py load_fixtures
 ```
 
 ### Instructions

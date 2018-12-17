@@ -3,8 +3,6 @@ from decouple import config
 
 DEBUG = True
 SECRET_KEY = config('SECRET_KEY', default='dev_secret_key')
-USERNAME = 'admin'
-PASSWORD = 'default'
 
 
 # DB Settings
