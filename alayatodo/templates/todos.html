@@ -7,6 +7,7 @@
 
       <th>#</th><th>User</th><th>Description</th><th>Mark as Completed</th><th>Delete</th>
 
+      <!-- TODO list -->
       {% for todo in todos %}
         <tr class="{% if todo.completed %}todo-completed{% endif %}">
           <td>{{ todo.id }}</td>
@@ -17,12 +18,14 @@
             </a>
           </td>
           <td>
+            <!-- Mark TODO as completed -->
             <form method="POST" action="{{ url_for('todo_complete', id=todo.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-xs btn-success"><span class="glyphicon glyphicon-ok glyphicon-white"></span></button>
             </form>
           </td>
           <td>
+            <!-- Delete TODO -->
             <form method="POST" action="{{ url_for('todo_delete', id=todo.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-remove glyphicon-white"></span></button>
@@ -31,6 +34,7 @@
         </tr>
       {% endfor %}
 
+      <!-- Add TODO -->
       <tr>
         <form method="post" action="{{ url_for('todo_insert') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -42,6 +46,8 @@
           </td>
         </form>
       </tr>
+
+      <!-- Paginator Nav -->
       <tr>
         <td colspan="4">
           <ul class="pagination">
