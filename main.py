@@ -5,6 +5,7 @@ Usage:
   main.py initdb
   main.py db migrate
   main.py db upgrade
+  main.py load_fixtures
 """
 import sys
 

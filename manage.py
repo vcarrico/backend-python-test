@@ -4,7 +4,10 @@ import os
 from flask_migrate import MigrateCommand
 from flask_script import Manager
 
-from alayatodo import app
+from resources import fixtures
+
+from alayatodo import app, db
+from alayatodo.models import User, Todo
 
 manager = Manager(app)
 
@@ -24,7 +27,17 @@ def _run_sql(filename):
 @manager.command
 def initdb():
     _run_sql('resources/database.sql')
-    _run_sql('resources/fixtures.sql')
     print "AlayaTodo: Database initialized."
+
+
+@manager.command
+def load_fixtures():
+    for user in fixtures.USERS:
+        db.session.add(User(**user))
+        db.session.commit()
+    for todo in fixtures.TODOS:
+        db.session.add(Todo(**todo))
+        db.session.commit()
+    print "AlayaTodo: Fixtures loaded."
 
 manager.add_command('db', MigrateCommand)
