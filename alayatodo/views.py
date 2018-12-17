@@ -1,4 +1,5 @@
 from flask import (
+    abort,
     flash,
     redirect,
     render_template,
@@ -17,7 +18,7 @@ from alayatodo.helpers import (
     ITEMS_PER_PAGE)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', ])
 def home():
     with app.open_resource('../README.md', mode='r') as f:
         readme = "".join(l.decode('utf-8') for l in f)
@@ -52,9 +53,11 @@ def logout():
 @login_required
 def todo(id, response_format):
     todo = Todo.query.filter_by(id=id, user_id=session['user']['id']).first()
-    if response_format == 'json':
-        return todo.to_json()
-    return render_template('todo.html', todo=todo)
+    if todo:
+        if response_format == 'json':
+            return todo.to_json()
+        return render_template('todo.html', todo=todo)
+    abort(404)
 
 
 @app.route('/todos/', defaults={'page': 1})
@@ -97,7 +100,7 @@ def todo_insert():
             page=get_last_page_uncompleted(session['user']['id'])))
 
 
-@app.route('/todo/<id>/delete', methods=['POST', ])
+@app.route('/todo/<id>/delete', methods=['POST'])
 @login_required
 def todo_delete(id):
     todo = Todo.query.filter_by(id=id, user_id=session['user']['id']).first()

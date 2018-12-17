@@ -6,6 +6,7 @@ Usage:
   main.py db migrate
   main.py db upgrade
   main.py load_fixtures
+  main.py test
 """
 import sys
 

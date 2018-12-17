@@ -1,5 +1,6 @@
 import subprocess
 import os
+import pytest
 
 from flask_migrate import MigrateCommand
 from flask_script import Manager
@@ -39,5 +40,10 @@ def load_fixtures():
         db.session.add(Todo(**todo))
         db.session.commit()
     print "AlayaTodo: Fixtures loaded."
+
+
+@manager.command
+def test():
+    pytest.main(["-s", "alayatodo/tests"])
 
 manager.add_command('db', MigrateCommand)
