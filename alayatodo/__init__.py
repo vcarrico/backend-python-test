@@ -8,12 +8,17 @@ from flask_wtf.csrf import CSRFProtect
 from alayatodo import settings
 
 
-app = Flask(__name__)
-app.config.from_object(settings)
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(settings)
+
+    return app
+
+app = create_app()
 
 # Database
 db = SQLAlchemy(app)
-migrate = Migrate(app, db, directory=settings.MIGRATIONS_DIRECTORY)
+Migrate(app, db, directory=settings.MIGRATIONS_DIRECTORY)
 
 # CSRF Protection
 csrf = CSRFProtect(app)
@@ -38,4 +43,4 @@ def teardown_request(exception):
         db.close()
 
 
-import alayatodo.views
+import alayatodo.views  # noqa
