@@ -50,6 +50,7 @@ def get_previous_page(page):
     min(page - 1, 1)
 
 
-def get_last_user_page(user_id):
-    user_todos = Todo.query.filter_by(user_id=user_id).all()
+def get_last_page_uncompleted(user_id):
+    """It gets the last page of uncompleted `todos` from an user."""
+    user_todos = Todo.query.filter_by(user_id=user_id, completed=False).all()
     return get_page_max(len(user_todos))

@@ -13,7 +13,7 @@ from alayatodo.forms import TodoForm, LoginForm
 from alayatodo.models import Todo
 from alayatodo.helpers import (
     login_user, login_redirect, login_required,
-    get_previous_page, get_next_page, get_page_max, get_last_user_page,
+    get_previous_page, get_next_page, get_page_max, get_last_page_uncompleted,
     ITEMS_PER_PAGE)
 
 
@@ -61,15 +61,19 @@ def todo(id, response_format):
 @app.route('/todos/<int:page>', methods=['GET'], strict_slashes=False)
 @login_required
 def todos_list(page):
-    user_todos = Todo.query.filter_by(user_id=session['user']['id'])
-    all_todos = user_todos.all()
-    todos_current_page = user_todos.paginate(page, ITEMS_PER_PAGE, True).items
+    user_todos_query = Todo.query.filter_by(
+        user_id=session['user']['id']).order_by(Todo.completed)
+
+    todos = user_todos_query.all()
+    todos_current_page = user_todos_query.paginate(
+        page, ITEMS_PER_PAGE, True).items
+
     context = {
         'todos': todos_current_page,
         'current_page': page,
         'previous_page': get_previous_page(page),
-        'next_page': get_next_page(page, len(all_todos)),
-        'max_page': get_page_max(len(all_todos))
+        'next_page': get_next_page(page, len(todos)),
+        'max_page': get_page_max(len(todos))
     }
     return render_template('todos.html', **context)
 
@@ -88,7 +92,9 @@ def todo_insert():
     else:
         flash("ToDo description is required!")
     return redirect(
-        url_for('todos_list', page=get_last_user_page(session['user']['id'])))
+        url_for(
+            'todos_list',
+            page=get_last_page_uncompleted(session['user']['id'])))
 
 
 @app.route('/todo/<id>/delete', methods=['POST', ])
