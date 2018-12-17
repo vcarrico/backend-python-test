@@ -47,7 +47,7 @@ def get_next_page(page, items_count):
 
 
 def get_previous_page(page):
-    min(page - 1, 1)
+    return max(page - 1, 1)
 
 
 def get_last_page_uncompleted(user_id):

@@ -25,7 +25,7 @@ def home():
 
 
 @app.route('/login', methods=['GET', 'POST'])
-@login_redirect('/todo')
+@login_redirect('/todos')
 def login():
     error = ''
     username = request.form.get('username')
@@ -35,7 +35,7 @@ def login():
     if request.method == 'POST' and form.validate():
         logged_in = login_user(username=username, password=password)
         if logged_in:
-            return redirect('/todo')
+            return redirect('/todos')
         error = "Invalid username or password!"
     return render_template('login.html', error=error, form=form)
 
@@ -116,3 +116,9 @@ def todo_complete(id):
         todo.completed = not todo.completed
         db.session.commit()
     return redirect('/todos')
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+app.register_error_handler(404, page_not_found)
